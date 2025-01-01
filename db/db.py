@@ -18,6 +18,14 @@ CREATE TABLE IF NOT EXISTS signals (
     PRIMARY KEY (symbol, interval)
 )
 """)
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    user_id INTEGER,
+    percent REAL
+)
+""")
+
 conn.commit()
 
 def update_signal(symbol, interval, pctRankT, pctile, pctRankB, pctileB):
@@ -39,12 +47,28 @@ def update_signal(symbol, interval, pctRankT, pctile, pctRankB, pctileB):
     return False  # Значения не изменились
 # update_signal('c', '1', 12.2, 12.2, 12,2, )
 
-
-def get_signal():
+def set_user(user_id, percent):
     cursor.execute("""
-    SELECT * FROM signals
-    """)
-    row = cursor.fetchall()
-    return row
+    INSERT OR REPLACE INTO users (user_id, percent)
+    VALUES (?, ?)
+    """, (user_id, percent))
+    conn.commit()
+    return True  # Значения обновились
 
-print(get_signal())
+def up_percent(user_id, new_percent):
+    cursor.execute("""
+    UPDATE users
+    SET percent = ?
+    WHERE user_id = ?
+    """, (new_percent, user_id))  # Передаем новое значение и идентификатор пользователя
+    conn.commit()  # Сохраняем изменения в базе данных
+    
+
+
+# Исправление функции get_user
+def get_user(user_id):
+    cursor.execute("""
+    SELECT * FROM users WHERE user_id=?
+    """, (user_id,))  # Добавляем запятую для формирования кортежа
+    row = cursor.fetchone()
+    return row
