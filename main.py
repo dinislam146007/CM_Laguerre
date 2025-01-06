@@ -48,7 +48,7 @@ async def main():
     # Запуск парсера в отдельном потоке
     loop = asyncio.get_event_loop()
     loop.run_in_executor(None, run_task, ['1D', '4H', '1H', '30'], SIGNAL_QUEUE)
-
+    loop.run_in_executor(None, )
     # Запуск бота
     asyncio.create_task(notify_signals())
     await dp.start_polling(bot)
